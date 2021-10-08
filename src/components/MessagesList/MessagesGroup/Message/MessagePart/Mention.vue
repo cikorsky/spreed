@@ -27,6 +27,10 @@
 			:avatar-image="'icon-group-forced-white'"
 			:primary="true" />
 		<UserBubble
+			v-else-if="isGroupMention"
+			:display-name="name"
+			:avatar-image="'icon-group-forced-white'" />
+		<UserBubble
 			v-else-if="isMentionToGuest"
 			:display-name="name"
 			:avatar-image="'icon-user-forced-white'"
@@ -68,6 +72,9 @@ export default {
 	computed: {
 		isMentionToAll() {
 			return this.type === 'call'
+		},
+		isGroupMention() {
+			return this.type === 'group'
 		},
 		isMentionToGuest() {
 			return this.type === 'guest'
