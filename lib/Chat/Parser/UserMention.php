@@ -30,6 +30,8 @@ use OCA\Talk\Model\Attendee;
 use OCA\Talk\Model\Message;
 use OCA\Talk\Room;
 use OCP\Comments\ICommentsManager;
+use OCP\IGroup;
+use OCP\IGroupManager;
 use OCP\IL10N;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -49,6 +51,8 @@ class UserMention {
 	private $commentsManager;
 	/** @var IUserManager */
 	private $userManager;
+	/** @var IGroupManager */
+	private $groupManager;
 	/** @var GuestManager */
 	private $guestManager;
 	/** @var IL10N */
@@ -56,10 +60,12 @@ class UserMention {
 
 	public function __construct(ICommentsManager $commentsManager,
 								IUserManager $userManager,
+								IGroupManager $groupManager,
 								GuestManager $guestManager,
 								IL10N $l) {
 		$this->commentsManager = $commentsManager;
 		$this->userManager = $userManager;
+		$this->groupManager = $groupManager;
 		$this->guestManager = $guestManager;
 		$this->l = $l;
 	}
@@ -107,15 +113,22 @@ class UserMention {
 			}
 			$mentionTypeCount[$mention['type']]++;
 
+			$search = $mention['id'];
+			if ($mention['type'] === 'group') {
+				$search = 'group/' . $mention['id'];
+			}
+
 			// To keep a limited character set in parameter IDs ([a-zA-Z0-9-])
 			// the mention parameter ID does not include the mention ID (which
 			// could contain characters like '@' for user IDs) but a one-based
 			// index of the mentions of that type.
 			$mentionParameterId = 'mention-' . $mention['type'] . $mentionTypeCount[$mention['type']];
 
-			$message = str_replace('@"' . $mention['id'] . '"', '{' . $mentionParameterId . '}', $message);
-			if (strpos($mention['id'], ' ') === false && strpos($mention['id'], 'guest/') !== 0) {
-				$message = str_replace('@' . $mention['id'], '{' . $mentionParameterId . '}', $message);
+			$message = str_replace('@"' . $search . '"', '{' . $mentionParameterId . '}', $message);
+			if (strpos($search, ' ') === false
+				&& strpos($search, 'guest/') !== 0
+				&& strpos($search, 'group/') !== 0) {
+				$message = str_replace('@' . $search, '{' . $mentionParameterId . '}', $message);
 			}
 
 			if ($mention['type'] === 'call') {
@@ -136,6 +149,19 @@ class UserMention {
 					$displayName = $participant->getAttendee()->getDisplayName() ?: $this->l->t('Guest');
 				} catch (ParticipantNotFoundException $e) {
 					$displayName = $this->l->t('Guest');
+				}
+
+				$messageParameters[$mentionParameterId] = [
+					'type' => $mention['type'],
+					'id' => $mention['id'],
+					'name' => $displayName,
+				];
+			} elseif ($mention['type'] === 'group') {
+				$group = $this->groupManager->get($mention['id']);
+				if ($group instanceof IGroup) {
+					$displayName = $group->getDisplayName();
+				} else {
+					$displayName = $mention['id'];
 				}
 
 				$messageParameters[$mentionParameterId] = [
