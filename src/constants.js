@@ -112,6 +112,7 @@ export const WEBINAR = {
 	SIP: {
 		DISABLED: 0,
 		ENABLED: 1,
+		ENABLED_NO_PIN: 2,
 	},
 }
 export const SHARE = {

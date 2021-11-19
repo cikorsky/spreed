@@ -511,10 +511,10 @@ describe('conversationsStore', () => {
 
 			await store.dispatch('setSIPEnabled', {
 				token: testToken,
-				state: true,
+				state: WEBINAR.SIP.ENABLED,
 			})
 
-			expect(setSIPEnabled).toHaveBeenCalledWith(testToken, true)
+			expect(setSIPEnabled).toHaveBeenCalledWith(testToken, WEBINAR.SIP.ENABLED)
 
 			const changedConversation = store.getters.conversation(testToken)
 			expect(changedConversation.sipEnabled).toBe(true)
