@@ -278,6 +278,11 @@ CallParticipantModel.prototype = {
 
 		this.get('peer').on('extendedIceConnectionStateChange', this._handleExtendedIceConnectionStateChangeBound)
 		this.get('peer').on('signalingStateChange', this._handleSignalingStateChangeBound)
+
+		// Set expected state in Peer object.
+		if (this._simulcastVideoQuality !== undefined) {
+			this.setSimulcastVideoQuality(this._simulcastVideoQuality)
+		}
 	},
 
 	_handleExtendedIceConnectionStateChange(extendedIceConnectionState) {
@@ -363,6 +368,11 @@ CallParticipantModel.prototype = {
 
 		// Reset state that depends on the screen Peer object.
 		this._handlePeerStreamAdded(this.get('screenPeer'))
+
+		// Set expected state in screen Peer object.
+		if (this._simulcastScreenQuality !== undefined) {
+			this.setSimulcastScreenQuality(this._simulcastScreenQuality)
+		}
 	},
 
 	setUserId(userId) {
@@ -378,6 +388,9 @@ CallParticipantModel.prototype = {
 			return
 		}
 
+		// Store value to be able to apply it again if a new Peer object is set.
+		this._simulcastVideoQuality = simulcastVideoQuality
+
 		// Use same quality for simulcast and temporal layer.
 		this.get('peer').selectSimulcastStream(simulcastVideoQuality, simulcastVideoQuality)
 	},
@@ -386,6 +399,10 @@ CallParticipantModel.prototype = {
 		if (!this.get('screenPeer') || !this.get('screenPeer').enableSimulcast) {
 			return
 		}
+
+		// Store value to be able to apply it again if a new screen Peer object
+		// is set.
+		this._simulcastScreenQuality = simulcastScreenQuality
 
 		// Use same quality for simulcast and temporal layer.
 		this.get('screenPeer').selectSimulcastStream(simulcastScreenQuality, simulcastScreenQuality)
