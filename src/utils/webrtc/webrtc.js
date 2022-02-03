@@ -631,7 +631,12 @@ export default function initWebRtc(signaling, _callParticipantCollection, _local
 			return peer.id === message.from && peer.type === message.roomType && peer.sid !== message.sid
 		})
 
-		if (stalePeer) {
+		// When a new offer is received a new connection should be established,
+		// so the previous Peer is ended before the message is handled to force
+		// the creation of a new Peer. The exception is when the offer is an
+		// update of the current connection; in that case the offer needs to be
+		// handled by the existing peer.
+		if (stalePeer && !message.update) {
 			stalePeer.end()
 		}
 
@@ -940,14 +945,31 @@ export default function initWebRtc(signaling, _callParticipantCollection, _local
 			// to force a full reconnection, it is enough to reconnect only that
 			// peer.
 			if (signaling.hasFeature('mcu') && peer.id !== signaling.getSessionId()) {
-				signaling.requestOffer(peer.id, 'video')
+				// If possible update connection rather than creating a new one.
+				let update = signaling.hasFeature('subscriber-update')
+
+				// Create a connection if the current one has failed, as it
+				// would require an ICE restart rather than update to recover.
+				if (update && (peer.pc.iceConnectionState === 'failed' || peer.pc.connectionState === 'failed')) {
+					update = false
+				}
+
+				// If the connection needs to be updated but a new connection
+				// (or another update) is already pending ignore the new update.
+				// If a new connection needs to be created rather than updated
+				// then force it even if there is another one already pending.
+				if (update && delayedConnectionToPeer[peer.id]) {
+					return
+				}
+
+				signaling.requestOffer(peer.id, 'video', update)
 
 				clearInterval(delayedConnectionToPeer[peer.id])
 
 				delayedConnectionToPeer[peer.id] = setInterval(function() {
-					console.debug('No offer received, request offer again', peer)
+					console.debug('No offer received, request offer again' + update ? '(update)' : '', peer)
 
-					signaling.requestOffer(peer.id, 'video')
+					signaling.requestOffer(peer.id, 'video', update)
 				}, 10000)
 
 				return

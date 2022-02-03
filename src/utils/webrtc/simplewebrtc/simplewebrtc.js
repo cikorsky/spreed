@@ -84,6 +84,10 @@ function SimpleWebRTC(opts) {
 				peers.forEach(function(p) {
 					if (p.sid === message.sid) {
 						peer = p
+					} else if (!message.sid && p.id === message.from) {
+						// Offer to be handled by the same receiver Peer as
+						// before when the HPB is used.
+						peer = p
 					}
 				})
 				// if (!peer) peer = peers[0]; // fallback for old protocol versions
