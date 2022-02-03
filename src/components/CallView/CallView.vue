@@ -649,6 +649,9 @@ export default {
 		// Toggles videos on and off
 		handleToggleVideo({ peerId, value }) {
 			this.sharedDatas[peerId].videoEnabled = value
+
+			const callParticipantModel = this.callParticipantModels.find(callParticipantModel => callParticipantModel.attributes.peerId === peerId)
+			callParticipantModel.setVideoBlocked(!value)
 		},
 
 		adjustSimulcastQuality() {

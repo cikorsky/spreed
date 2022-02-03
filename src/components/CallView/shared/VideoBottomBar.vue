@@ -63,7 +63,7 @@
 							fill-color="#ffffff"
 							decorative />
 					</button>
-					<button v-show="!connectionStateFailedNoRestart && model.attributes.videoAvailable"
+					<button v-show="!connectionStateFailedNoRestart && (model.attributes.videoAvailable || model.attributes.videoBlocked)"
 						v-tooltip="videoButtonTooltip"
 						class="hideRemoteVideo"
 						@click.stop="toggleVideo">
