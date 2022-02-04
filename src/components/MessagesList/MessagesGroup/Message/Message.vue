@@ -114,6 +114,7 @@ the main body of the message as well as a quote.
 			</div>
 		</div>
 		<MessageButtonsBar v-if="hasMessageButtonsBar"
+			v-show="true"
 			ref="messageButtonsBar"
 			:message-object="messageObject"
 			v-bind="$props"
