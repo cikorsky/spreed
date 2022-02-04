@@ -114,7 +114,8 @@ the main body of the message as well as a quote.
 			</div>
 		</div>
 		<MessageButtonsBar v-if="hasMessageButtonsBar"
-			v-show="showMessageButtonsBar"
+			ref="messageButtonsBar"
+			:message-object="messageObject"
 			v-bind="$props"
 			:previous-message-id="previousMessageId" />
 		<div v-if="isLastReadMessage"
@@ -123,9 +124,6 @@ the main body of the message as well as a quote.
 				<span>{{ t('spreed', 'Unread messages') }}</span>
 			</div>
 		</div>
-		<Forwarder v-if="showForwarder"
-			:message-object="messageObject"
-			@close="showForwarder = false" />
 	</li>
 </template>
 
@@ -150,7 +148,6 @@ import { CONVERSATION } from '../../../../constants'
 import moment from '@nextcloud/moment'
 import Location from './MessagePart/Location'
 import Contact from './MessagePart/Contact.vue'
-import Forwarder from './MessagePart/Forwarder'
 import MessageButtonsBar from './MessageButtonsBar/MessageButtonsBar.vue'
 
 export default {
@@ -168,7 +165,6 @@ export default {
 		Check,
 		CheckAll,
 		Reload,
-		Forwarder,
 		MessageButtonsBar,
 	},
 
@@ -316,8 +312,6 @@ export default {
 			isDeleting: false,
 			// whether the message was seen, only used if this was marked as last read message
 			seen: false,
-			// Shows/hides the message forwarder component
-			showForwarder: false,
 			isActionMenuOpen: false,
 		}
 	},
