@@ -5,7 +5,7 @@ export default function(stream, element, options) {
 		element = document.createElement(options.audio ? 'audio' : 'video')
 	}
 
-	element.srcObject = stream;
+	element.srcObject = stream
 
 	return element
 }
