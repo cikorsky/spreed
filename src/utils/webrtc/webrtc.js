@@ -627,7 +627,12 @@ export default function initWebRtc(signaling, _callParticipantCollection, _local
 			return peer.id === message.from && peer.type === message.roomType && peer.sid !== message.sid
 		})
 
-		if (stalePeer) {
+		// When a new offer is received a new connection should be established,
+		// so the previous Peer is ended before the message is handled to force
+		// the creation of a new Peer. The exception is when the offer is an
+		// update of the current connection; in that case the offer needs to be
+		// handled by the existing peer.
+		if (stalePeer && !message.update) {
 			stalePeer.end()
 		}
 
