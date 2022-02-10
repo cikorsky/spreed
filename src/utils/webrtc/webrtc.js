@@ -964,7 +964,12 @@ export default function initWebRtc(signaling, _callParticipantCollection, _local
 				// one forced reconnection even if there are several peers.
 				// FIXME: despite all of the above this is a dirty and ugly hack
 				// that should be fixed with proper renegotiation.
-				forceReconnect(signaling, flags)
+				if (signaling.hasFeature('mcu') && signaling.hasFeature('publisher-update') && peer === ownPeer) {
+					signaling.updateCurrentCallFlags(flags)
+					ownPeer.start()
+				} else {
+					forceReconnect(signaling, flags)
+				}
 			}
 		})
 	}
@@ -1259,7 +1264,12 @@ export default function initWebRtc(signaling, _callParticipantCollection, _local
 		let flags = signaling.getCurrentCallFlags()
 		flags |= PARTICIPANT.CALL_FLAG.WITH_VIDEO
 
-		forceReconnect(signaling, flags)
+		if (signaling.hasFeature('mcu') && signaling.hasFeature('publisher-update') && ownPeer) {
+			signaling.updateCurrentCallFlags(flags)
+			ownPeer.start()
+		} else {
+			forceReconnect(signaling, flags)
+		}
 	})
 
 	webrtc.webrtc.on('iceFailed', function(/* peer */) {
