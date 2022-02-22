@@ -216,7 +216,7 @@ const getters = {
 			return reactions
 		} else {
 			const simpleReactions = {}
-			for (const reaction in Object.keys(reactions)) {
+			for (const reaction of Object.keys(reactions)) {
 				simpleReactions[reaction] = reactions[reaction].length
 			}
 			return simpleReactions
