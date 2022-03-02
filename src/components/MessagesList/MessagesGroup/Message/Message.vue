@@ -135,7 +135,7 @@ the main body of the message as well as a quote.
 				</Popover>
 
 				<!-- More reactions picker -->
-				<EmojiPicker :per-line="5" @select.stop="">
+				<EmojiPicker :per-line="5">
 					<button class="reaction-button">
 						<EmoticonOutline :size="15" />
 					</button>
@@ -559,7 +559,7 @@ export default {
 		},
 
 		hasReactions() {
-			return this.messageObject.reactions?.length !== 0
+			return this.$store.getters.hasReactions(this.token, this.id)
 		},
 
 		simpleReactions() {
@@ -567,7 +567,7 @@ export default {
 		},
 
 		detailedReactions() {
-			return this.$store.getters.reactions(this.token, this.messageObject.id)
+			return this.$store.getters.reactions(this.token, this.id)
 		},
 	},
 
@@ -633,10 +633,9 @@ export default {
 				 * reactions.
 				 */
 				this.detailedReactionsRequested = true
-				console.debug('getting reactions details')
 				await this.$store.dispatch('getReactions', {
 					token: this.token,
-					messageId: this.messageObject.id,
+					messageId: this.id,
 				})
 			} catch {
 				this.detailedReactionsRequested = false
@@ -648,21 +647,23 @@ export default {
 				await this.getReactions()
 			}
 			// Check if current user has already added this reaction to the message
-			const currentUserHasReacted = this.detailedReactions[clickedEmoji].filter(item => {
-				return item.actorId === this.actorId
-			}).length !== 0
+			const currentUserHasReacted = this.$store.getters.userHasReacted(this.actorId, this.token, this.id, clickedEmoji)
 
 			if (!currentUserHasReacted) {
+				console.debug('adding reaction')
 				this.$store.dispatch('addReactionToMessage', {
 					token: this.token,
-					messageId: this.messageObject.id,
+					messageId: this.id,
 					selectedEmoji: clickedEmoji,
+					actorId: this.actorId,
 				})
 			} else {
+				console.debug('user has already reacted, removing reaction')
 				this.$store.dispatch('removeReactionFromMessage', {
 					token: this.token,
-					messageId: this.messageObject.id,
+					messageId: this.id,
 					selectedEmoji: clickedEmoji,
+					actorId: this.actorId,
 				})
 			}
 		},

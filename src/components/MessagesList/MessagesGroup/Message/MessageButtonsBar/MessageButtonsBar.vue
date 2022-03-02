@@ -111,7 +111,7 @@
 					<span>❤️</span>
 				</template>
 			</Button>
-			<EmojiPicker @select.stop="">
+			<EmojiPicker @select="addReactionToMessage">
 				<Button type="tertiary">
 					<template #icon>
 						<Plus :size="20" />
@@ -185,6 +185,11 @@ export default {
 
 		messageObject: {
 			type: Object,
+			required: true,
+		},
+
+		actorId: {
+			type: String,
 			required: true,
 		},
 	},
@@ -357,13 +362,19 @@ export default {
 		},
 
 		addReactionToMessage(selectedEmoji) {
-			this.$store.dispatch('addReactionToMessage', {
-				token: this.token,
-				messageId: this.messageObject.id,
-				selectedEmoji,
-			})
-		},
+			// Add reaction only if user hasn't reacted yet
+			if (!this.$store.getters.userHasReacted(this.actorId, this.token, this.messageObject.id, selectedEmoji)) {
+				this.$store.dispatch('addReactionToMessage', {
+					token: this.token,
+					messageId: this.messageObject.id,
+					selectedEmoji,
+					actorId: this.actorId,
+				})
+			} else {
+				console.debug('Current user has already reacted')
+			}
 
+		},
 	},
 }
 </script>
