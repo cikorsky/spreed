@@ -25,7 +25,6 @@ declare(strict_types=1);
 namespace OCA\Talk\Chat;
 
 use OCA\Talk\Exceptions\ParticipantNotFoundException;
-use OCA\Talk\Exceptions\RoomNotFoundException;
 use OCA\Talk\Files\Util;
 use OCA\Talk\Manager;
 use OCA\Talk\Model\Attendee;
@@ -160,7 +159,7 @@ class Notifier {
 	 * @param array $list
 	 * @psalm-param array<int, array{id: string, type: string}> $list
 	 * @return array
-	 * @psalm-return array<int, array{id: string, type: string}>
+	 * @psalm-return array<int, array{id: string, type: string, ?attendee: Attendee}>
 	 */
 	private function addMentionAllToList(Room $chat, array $list): array {
 		$usersToNotify = array_filter($list, static function (array $user): bool {
