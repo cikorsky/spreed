@@ -66,7 +66,8 @@
 			<CollectionList v-if="getUserId && conversation.token"
 				:id="conversation.token"
 				type="room"
-				:name="conversation.displayName" />
+				:name="conversation.displayName"
+				:is-active="activeTab === 'details-tab'" />
 			<div v-if="!getUserId" id="app-settings">
 				<div id="app-settings-header">
 					<button class="settings-button" @click="showSettings">
