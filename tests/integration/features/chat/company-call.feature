@@ -217,4 +217,5 @@ Feature: callapi/company-call
       | roomType | 2 |
       | invite   | company |
     When user "employee1" sends message "Message 1" to room "room" with 201
-    When user "employee1" sends message "Message 2 @all" to room "room" with 201
+    When user "employee1" sends message "Message 2 @employee2" to room "room" with 201
+    When user "employee1" sends message "Message 3 @all" to room "room" with 201
