@@ -590,7 +590,7 @@ class FeatureContext implements Context, SnippetAcceptingContext {
 	private function mapPermissionsAPIOutput($permissions): string {
 		$permissions = (int) $permissions;
 
-		$permissionsString = !$permissions? 'D': '';
+		$permissionsString = !$permissions ? 'D' : '';
 		foreach (self::$permissionsMap as $char => $int) {
 			if ($permissions & $int) {
 				$permissionsString .= $char;
