@@ -86,7 +86,7 @@ export default {
 		},
 
 		/**
-		 * Combined final permisssions of the current participant, from the
+		 * Combined final permissions of the current participant, from the
 		 * participants store.
 		 */
 		permissions() {
